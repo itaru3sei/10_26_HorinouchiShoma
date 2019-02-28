@@ -18,6 +18,14 @@ $life_flg = $_POST["life_flg"];
 // DB接続
 $pdo = db_conn();
 
+// lid名の重複を弾く
+$sql2 = "SELECT COUNT(*) FROM user_table WHERE lid='$lid'";
+$stmt2 = $pdo->query($sql2);
+$count = $stmt2->fetchColumn();
+if ($count) {
+    exit("既に存在するログインIDです");
+}
+
 // データ登録SQL作成
 $sql ="INSERT INTO user_table(id, name, lid, lpw, kanri_flg, life_flg) VALUES(NULL, :name, :lid, :lpw, :kanri_flg, :life_flg)";
 $stmt = $pdo->prepare($sql);

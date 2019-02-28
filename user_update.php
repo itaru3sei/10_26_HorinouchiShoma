@@ -31,7 +31,6 @@ $stmt->bindValue(":life_flg", $life_flg, PDO::PARAM_STR);
 $stmt->bindValue(":id", $id, PDO::PARAM_STR);
 $status = $stmt->execute();
 
-
 //4．データ登録処理後
 if ($status==false) {
     errorMsg($stmt);

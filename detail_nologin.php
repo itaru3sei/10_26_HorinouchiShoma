@@ -31,7 +31,7 @@ if ($status==false) {
 }
 
 // ユーザーリストHTMLを作成
-$userlist = createUserlist($rs["name"], "");
+$userlist = createUserlist($rs["name"], "disabled");
 
 ?>
 
@@ -49,16 +49,12 @@ $userlist = createUserlist($rs["name"], "");
         <?=$userlist?>
         <div class="form-group">
             <label for="moisture">水分量 *</label>
-            <input type="number" class="form-control" id="moisture" name="moisture" value="<?=$rs['moisture']?>" step="0.1">
+            <input type="number" class="form-control" id="moisture" name="moisture" value="<?=$rs['moisture']?>" step="0.1" disabled>
         </div>
         <div class="form-group">
             <label for="comment">コメント</label>
-            <textarea class="form-control" id="comment" name="comment" rows="3"><?=$rs['comment']?></textarea>
+            <textarea class="form-control" id="comment" name="comment" rows="3" disabled><?=$rs['comment']?></textarea>
         </div>
-        <div class="form-group">
-            <button type="submit" class="btn btn-primary">更新</button>
-        </div>
-        <input type="hidden" name="id" value="<?=$rs['id']?>">
     </form>
 
 </body>

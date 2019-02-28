@@ -1,6 +1,12 @@
 <?php
+// セッションのスタート
+session_start();
+
 include("functions.php");
 $title = "データ登録";
+
+// ログイン状態のチェック
+chk_ssid("login.php");
 
 // headHTMLを作成
 $head = headHtml($title);
@@ -9,7 +15,7 @@ $head = headHtml($title);
 $header = headerHtml($title);
 
 // ユーザーリストHTMLを作成
-$userlist = createUserlist("");
+$userlist = createUserlist("", "");
 
 ?>
 

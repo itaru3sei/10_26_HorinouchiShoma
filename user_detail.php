@@ -1,4 +1,7 @@
 <?php
+// セッションのスタート
+session_start();
+
 // 関数ファイルの読み込み
 include("functions.php");
 $title = "ユーザー更新";

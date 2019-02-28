@@ -1,6 +1,12 @@
 <?php
+// セッションのスタート
+session_start();
+
 include("functions.php");
 $title = "ユーザー一覧";
+
+// ログイン状態のチェック
+chk_ssid("login.php");
 
 // headHTMLを作成
 $head = headHtml($title);
@@ -11,18 +17,8 @@ $header = headerHtml($title);
 // DB接続
 $pdo = db_conn();
 
-// フィルタの値を決定
-$limit = "20";
-if (isset($_POST["limit"])) {
-    $limit = $_POST["limit"];
-}
-$like = "";
-if (isset($_POST["like"])) {
-    $like = $_POST["like"];
-}
-
 // データ表示SQL作成
-$sql = "SELECT * FROM user_table WHERE name LIKE '%$like%' LIMIT $limit";
+$sql = "SELECT * FROM user_table";
 $stmt = $pdo->prepare($sql);
 $status = $stmt->execute();
 
@@ -68,11 +64,6 @@ if ($status == false) {
     <?=$header?>
 
     <div class="container">
-        <form action="user_select.php" method="POST">
-            <input type="number" name="limit" min="0" value=<?=$limit?>>件
-            <input type="text" name="like" placeholder="検索ワード" value=<?=$like?>>
-            <input type="submit" value="抽出">
-        </form>
         <ul class="list-group">
             <?=$view?>
         </ul>

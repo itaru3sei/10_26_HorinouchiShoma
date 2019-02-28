@@ -41,6 +41,20 @@ function headHtml($title) {
 
 // ヘッダーHTML作成
 function headerHtml($title) {
+    $user_link = "";
+
+    // 管理ユーザーならuser_linkを追加
+    if (isset($_SESSION['kanri_flg']) && $_SESSION['kanri_flg']) {
+        $user_link = "
+        <li class='nav-item'>
+        <a class='nav-link' href='user_index.php'>ユーザー登録</a>
+        </li>
+        <li class='nav-item'>
+        <a class='nav-link' href='user_select.php'>ユーザー一覧</a>
+        </li>
+        ";
+    }
+
     $header = "<header>
         <nav class='navbar navbar-expand-lg navbar-light bg-light'>
         <a class='navbar-brand' href='#'>$title</a>
@@ -55,11 +69,9 @@ function headerHtml($title) {
         <li class='nav-item'>
         <a class='nav-link' href='select.php'>データ一覧</a>
         </li>
-        <li class='nav-item'>
-        <a class='nav-link' href='user_index.php'>ユーザー登録</a>
-        </li>
-        <li class='nav-item'>
-        <a class='nav-link' href='user_select.php'>ユーザー一覧</a>
+        $user_link
+        <li>
+        <a href='logout.php' class='btn btn-info btn-sm'>login / logout</a>
         </li>
         </ul>
         </div>
@@ -70,7 +82,7 @@ function headerHtml($title) {
 }
 
 // 登録済のユーザーリストHTMLを作成
-function createUserlist($userid) {
+function createUserlist($userid, $disabled) {
     // DB接続
     $pdo = db_conn();
 
@@ -100,7 +112,7 @@ function createUserlist($userid) {
 
     $userlist = "<div class='form-group'>
         <label for='name'>ユーザー名 *</label>
-        <select class='form-control' id='name' name='name'>
+        <select class='form-control' id='name' name='name' $disabled>
         <option></option>
         $userlist
         </select>
@@ -131,4 +143,17 @@ function getUsername ($userid) {
     }
 
     return $username;
+}
+
+// SESSIONチェック＆リジェネレイト
+function chk_ssid($location)
+{
+    if (!isset($_SESSION['chk_ssid']) || $_SESSION['chk_ssid']!=session_id()) {
+    // ログイン失敗時の処理（ログイン画面に移動）
+    header("Location: $location");
+    } else {
+        // ログイン成功時の処理（一覧画面に移動）
+        session_regenerate_id(true);
+        $_SESSION['chk_ssid'] = session_id();
+    }
 }

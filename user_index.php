@@ -1,6 +1,12 @@
 <?php
+// セッションのスタート
+session_start();
+
 include("functions.php");
 $title = "ユーザー登録";
+
+// ログイン状態のチェック
+chk_ssid("login.php");
 
 // headHTMLを作成
 $head = headHtml($title);
