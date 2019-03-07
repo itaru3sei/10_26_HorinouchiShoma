@@ -14,7 +14,6 @@ function db_conn()
     }
 }
 
-
 // SQL処理エラー
 function errorMsg($stmt)
 {
@@ -27,7 +26,7 @@ function h($str)
     return htmlspecialchars($str, ENT_QUOTES, 'UTF-8');
 }
 
-// headHTML作成
+// // headHTML作成
 function headHtml($title) {
     $head = "<head>
     <meta charset='UTF-8'>
@@ -40,38 +39,26 @@ function headHtml($title) {
 }
 
 // ヘッダーHTML作成
-function headerHtml($title) {
-    $user_link = "";
-
-    // 管理ユーザーならuser_linkを追加
-    if (isset($_SESSION['kanri_flg']) && $_SESSION['kanri_flg']) {
-        $user_link = "
-        <li class='nav-item'>
-        <a class='nav-link' href='user_index.php'>ユーザー登録</a>
-        </li>
-        <li class='nav-item'>
-        <a class='nav-link' href='user_select.php'>ユーザー一覧</a>
-        </li>
-        ";
-    }
-
-    $header = "<header>
+function headerHtml() {
+    $header = "<header class='mb-4'>
         <nav class='navbar navbar-expand-lg navbar-light bg-light'>
-        <a class='navbar-brand' href='#'>$title</a>
+        <a class='navbar-brand' href='#'>受給者証管理ツール</a>
         <button class='navbar-toggler' type='button' data-toggle='collapse' data-target='#navbarNav' aria-controls='navbarNav' aria-expanded='false' aria-label='Toggle navigation'>
         <span class='navbar-toggler-icon'></span>
         </button>
         <div class='collapse navbar-collapse' id='navbarNav'>
         <ul class='navbar-nav'>
         <li class='nav-item'>
-        <a class='nav-link' href='index.php'>データ登録</a>
+        <a class='nav-link' href='ju_registration.php'>受給者証登録</a>
         </li>
         <li class='nav-item'>
-        <a class='nav-link' href='select.php'>データ一覧</a>
+        <a class='nav-link' href='index.php'>受給者証一覧</a>
         </li>
-        $user_link
-        <li>
-        <a href='logout.php' class='btn btn-info btn-sm'>login / logout</a>
+        <li class='nav-item'>
+        <a class='nav-link' href='user_registration.php'>利用者登録</a>
+        </li>
+        <li class='nav-item'>
+        <a class='nav-link' href='user_select.php'>利用者一覧</a>
         </li>
         </ul>
         </div>
@@ -81,13 +68,15 @@ function headerHtml($title) {
     return $header;
 }
 
+
+
 // 登録済のユーザーリストHTMLを作成
-function createUserlist($userid, $disabled) {
+function createUserlist($userid) {
     // DB接続
     $pdo = db_conn();
 
     // SQL作成
-    $sql = "SELECT * FROM user_table";
+    $sql = "SELECT * FROM mst_care_user ORDER BY USER_KANA";
     $stmt = $pdo->prepare($sql);
     $status = $stmt->execute();
 
@@ -99,20 +88,20 @@ function createUserlist($userid, $disabled) {
     } else {
         //Selectデータの数だけ自動でループしてくれる
         while ($result = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $id = $result["id"];
-            $name = $result["name"];
+            $user_id = $result["USER_ID"];
+            $user_name = $result["USER_NAME"];
             // selected
             $selected = "";
-            if ($id == $userid) {
+            if ($user_id == $userid) {
                 $selected = 'selected="selected"';
             }
-            $userlist .= "<option value='$id' $selected>$name</option>";
+            $userlist .= "<option value='$user_id' $selected>$user_name</option>";
         }
     }
 
     $userlist = "<div class='form-group'>
-        <label for='name'>ユーザー名 *</label>
-        <select class='form-control' id='name' name='name' $disabled>
+        <label for='name'><b>利用者名 *</b></label>
+        <select class='form-control' id='user_id' name='user_id'>
         <option></option>
         $userlist
         </select>
@@ -126,34 +115,21 @@ function getUsername ($userid) {
     $pdo = db_conn();
 
     // SQL作成
-    $sql = "SELECT * FROM user_table WHERE id=$userid";
+    $sql = "SELECT * FROM mst_care_user WHERE USER_ID=$userid";
     $stmt = $pdo->prepare($sql);
     $status = $stmt->execute();
 
     // ユーザーリスト作成
     $username="";
     if ($status == false) {
-        //execute（SQL実行時にエラーがある場合）
+        //execute（SQL実行時にエラーがある場合
         errorMsg($stmt);
     } else {
         //Selectデータの数だけ自動でループしてくれる
         while ($result = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $username = $result["name"];
+            $username = $result["USER_NAME"];
         }
     }
 
     return $username;
-}
-
-// SESSIONチェック＆リジェネレイト
-function chk_ssid($location)
-{
-    if (!isset($_SESSION['chk_ssid']) || $_SESSION['chk_ssid']!=session_id()) {
-    // ログイン失敗時の処理（ログイン画面に移動）
-    header("Location: $location");
-    } else {
-        // ログイン成功時の処理（一覧画面に移動）
-        session_regenerate_id(true);
-        $_SESSION['chk_ssid'] = session_id();
-    }
 }

@@ -1,12 +1,6 @@
 <?php
-// セッションのスタート
-session_start();
-
 include("functions.php");
-$title = "ユーザー一覧";
-
-// ログイン状態のチェック
-chk_ssid("login.php");
+$title = "利用者一覧";
 
 // headHTMLを作成
 $head = headHtml($title);
@@ -18,7 +12,7 @@ $header = headerHtml($title);
 $pdo = db_conn();
 
 // データ表示SQL作成
-$sql = "SELECT * FROM user_table";
+$sql = "SELECT * FROM mst_care_user";
 $stmt = $pdo->prepare($sql);
 $status = $stmt->execute();
 
@@ -30,21 +24,26 @@ if ($status == false) {
 } else {
     //Selectデータの数だけ自動でループしてくれる
     while ($result = $stmt->fetch(PDO::FETCH_ASSOC)) {
-        $id = "id: ".$result["id"];
-        $name = "ユーザー名: ".$result["name"];
-        $lid = "ログインID: ".$result["lid"];
-        $lpw = "パスワード: ".$result["lpw"];
-        $kanri_flg = "kanri_flg: ".$result["kanri_flg"];
-        $life_flg = "life_flg: ".$result["life_flg"];
-        $edit = '<a href="user_detail.php?id='.$result['id'].'" class="badge badge-primary">Edit</a>';
-        $delete = '<a href="user_delete.php?id='.$result['id'].'" class="badge badge-danger">Delete</a>';
+        $user_id = "【usre_id】".$result["USER_ID"];
+        $user_name = "【利用者名】".$result["USER_NAME"];
+        $user_kana = "【リヨウシャメイ】".$result["USER_KANA"];
+        $service = "【利用サービス】";
+        if ($result["NURSING"]) {
+            $service .= "訪問看護 ";
+        }
+        if ($result["EMPLOYMENT_B"]) {
+            $service .= "就労継続支援 ";
+        }
+        if ($result["GH"]) {
+            $service .= "共同生活援助 ";
+        }
+        $edit = '<a href="user_detail.php?user_id='.$result['USER_ID'].'" class="badge badge-primary">編集</a>';
+        $delete = '<a href="user_delete.php?user_id='.$result['USER_ID'].'" class="badge badge-danger">削除</a>';
         $view .= "<li class='list-group-item'>
-            <p>$id</p>
-            <p>$name</p>
-            <p>$lid</p>
-            <p>$lpw</p>
-            <p>$kanri_flg</p>
-            <p>$life_flg</p>
+            <p>$user_id</p>
+            <p>$user_name</p>
+            <p>$user_kana</p>
+            <p>$service</p>
             $edit$delete
             </li>";
     }

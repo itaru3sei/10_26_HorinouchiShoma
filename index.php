@@ -1,21 +1,12 @@
 <?php
-// セッションのスタート
-session_start();
-
 include("functions.php");
-$title = "データ登録";
-
-// ログイン状態のチェック
-chk_ssid("login.php");
+$title = "受給者証登録";
 
 // headHTMLを作成
 $head = headHtml($title);
 
-// ヘッダー用HTMLを作成
-$header = headerHtml($title);
-
-// ユーザーリストHTMLを作成
-$userlist = createUserlist("", "");
+// header用HTMLを作成
+$header = headerHtml();
 
 ?>
 
@@ -28,20 +19,75 @@ $userlist = createUserlist("", "");
 
     <?=$header?>
 
-    <form action="insert.php" method="POST" class="container">
-        <?=$userlist?>
-        <div class="form-group">
-            <label for="moisture">水分量 *</label>
-            <input type="number" step="0.1" class="form-control" id="moisture" name="moisture">
-        </div>
-        <div class="form-group">
-            <label for="comment">コメント</label>
-            <textarea class="form-control" id="comment" name="comment" rows="3"></textarea>
-        </div>
-        <div class="form-group">
-            <button type="submit" class="btn btn-primary">登録</button>
-        </div>
-    </form>
+    <div class="container">
+        <ul id="echo" class="list-group">
+            <!-- データ表示部分 -->
+        </ul>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script>
+        // DBから取得したデータを表示する関数
+        function listData(data) {
+            const url = 'ju_get.php';
+            $.getJSON(url)
+                .done(function (data, textStatus, jqXHR) {
+                    console.log(data);
+
+                    // 今日の日付を取得
+                    let today = new Date();
+                    console.log(today);
+                
+                    // 表示用HTMLを作成
+                    let view = '';
+                    for (let i in data) {
+                        view += '<li class="list-group-item';
+                        // 期限切れに色を付ける
+                        var enddate = new Date(data[i].enddate);
+                        enddate.setDate(enddate.getDate() + 1);
+                        if (today > enddate) {
+                            view += ' bg-danger';
+                        }
+                        view += '">';
+                        view += '<p>【利用者名】' + data[i].USER_NAME + '</p>';
+                        view += '<p>【有効期間】' + data[i].startdate + " ~ " + data[i].enddate + '</p>';
+                        view += '<img src="' + data[i].image + '" alt="image" height="150px">';
+                        view += '<div><a href="ju_detail.php?id=' + data[i].id + '" class="badge badge-primary">編集</a>';
+                        view += '<a href="ju_delete.php?id=' + data[i].id + '" class="badge badge-danger">削除</a></div>';
+                        view += '</li>';
+                    }
+
+                    $("#echo").html(view);
+                })
+                .fail(function (jqXHR, textStatus, errorThrown) {
+                    console.log("error");
+                })
+                .always(function () {
+                    console.log("complete");
+                });
+        }
+
+        // DBからデータを取得する関数
+        function selectData() {
+            const url = 'ju_get.php';
+            $.getJSON(url)
+                .done(function (data, textStatus, jqXHR) {
+                    console.log(data);
+                    var res = data;
+                })
+                .fail(function (jqXHR, textStatus, errorThrown) {
+                    console.log("error");
+                })
+                .always(function () {
+                    console.log("complete");
+                });
+        }
+
+        // 読み込み時にDBからデータ取得
+        selectData();
+        listData();
+
+    </script>
 
 </body>
 
